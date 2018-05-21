@@ -1,52 +1,1 @@
-<!DOCTYPE html>
-<html lang="en">
-
-  <head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Master Game</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="css/shop-homepage.css" rel="stylesheet">
-
-  </head>
-
-  <body>
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="index.html">Master Game</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="index.html">Inicio</a>
-                <span class="sr-only">(current)</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="nosotros.php">Nosotros</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="contacto.php">Contacto</a>
-            </li>
-			<li class="nav-item">
-              <a class="nav-link" href="registro.php">Registro</a>
-            </li>
-			<li class="nav-item">
-              <a class="nav-link" href="login.php">Iniciar Sesión</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+<?phprequire 'admin/config.php';session_start();if(isset($_SESSION['usuario'])){    header('Location: index.php');}if($_SERVER['REQUEST_METHOD'] == 'POST'){    $nombre = $_POST['nombre'];    $apellido = $_POST['apellido'];    $mail = $_POST['mail'];    $usuario = filter_var(strtolower($_POST['usuario']), FILTER_SANITIZE_STRING);    $password = $_POST['clave'];    $password2 = $_POST['clave2'];    $tipo = $_POST['tipo_usuario'];    $errores = '';    if(empty($usuario) or empty($password) or empty($password2)){        $errores .= '<li>Por favor rellena todos los campos correctamente</li>';    }    else{        try{            $conexion = new PDO('mysql: host = localhost; dbname = mastergame', 'root', '');        }        catch(PDOException $e){            echo "Error: " . $e->getMessage();        }        $statement = $conexion->prepare('SELECT * FROM usuarios WHERE usuario = '.":usuario");        $statement->execute(array(':usuario' => $usuario));        $resultado = $statement->fetch();        if($resultado != false){            $errores .= '<li>El usuario ya existe!</li>';        }        $password = hash('sha512', $password);        $password2 = hash('sha512', $password2);        if($password != $password2){            $errores .= '<li>Las contraseñas no son iguales!</li>';        }    }    if($errores == ''){        $statement = $conexion->prepare('INSERT INTO mastergame.usuarios (nombre, apellido, mail, usuario, clave, tipo_usuario) VALUES (:nombre, :apellido, :mail, :usuario, :clave, :tipo_usuario)');        $statement->execute(array(            ':nombre' => $nombre,            ':apellido' => $apellido,            ':mail' => $mail,            ':usuario' => $usuario,            ':clave' => $password,            ':tipo_usuario' => 'cliente'        ));        header('Location: login.php');    }    else{        $errores .= '<li>Hubo un error muy grave! Contacte al soporte técnico.</li>';    }}require 'views/registro.view.php';?>

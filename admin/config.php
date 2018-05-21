@@ -1,0 +1,1 @@
+<?php/* ---- DEFINE LA RUTA INICIAL DEL SITIO PARA PODER USARLA EN LOS ENLACES ---- */define('RUTA', 'http://localhost/mastergame/');/* ---- DATOS DE ACCESO A LA BASE DE DATOS ---- */$bd_config = array(    'basedatos' => 'mastergame',    'usuario' => 'root',    'pass' => '');?>
